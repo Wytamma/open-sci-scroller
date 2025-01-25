@@ -47,8 +47,6 @@
 </script>
 
 <swiper-container
-        virtual={true}
-        slides-per-view={'auto'}
 	direction={'vertical'}
 	mousewheel={true}
 	on:swiperslidechange={onSlideChange}
