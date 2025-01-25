@@ -56,7 +56,7 @@
 >
 	{#if papers.length > 0}
 		{#each papers as paper (paper.title)}
-			<swiper-slide style="height: 95%;" class="rounded-lg">
+			<swiper-slide class="rounded-lg">
 				<PaperCard
 					title={paper.title}
 					authors={paper.authors}
