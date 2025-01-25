@@ -30,7 +30,6 @@
   "dependencies": {
     "@sveltejs/adapter-static": "^3.0.8",
     "lucide-svelte": "^0.474.0",
-    "pdfjs-dist": "^4.10.38",
     "swiper": "^11.2.1"
   }
 }
