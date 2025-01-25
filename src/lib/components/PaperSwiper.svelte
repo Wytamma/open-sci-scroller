@@ -47,12 +47,12 @@
 </script>
 
 <swiper-container
-	space-between={10}
+        virtual={true}
 	direction={'vertical'}
 	slides-per-view={'auto'}
 	mousewheel={true}
 	on:swiperslidechange={onSlideChange}
-	class="h-full max-w-xl mx-auto rounded-lg shadow-lg mt-2"
+	class="h-full max-w-xl mx-auto shadow-lg"
 >
 	{#if papers.length > 0}
 		{#each papers as paper (paper.title)}
