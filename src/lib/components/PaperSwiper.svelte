@@ -37,7 +37,7 @@
 	$: if (query) {
 		modal = {
 				type: 'prompt',
-				title: 'Settings',
+				title: 'New Search',
 				body: 'Enter a new query to find related papers',
 				value: query,
 				valueAttr: { type: 'text', minlength: 3, maxlength: 200, required: true },

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ExternalLink, Settings, Heart, Eye, EyeOff, ClipboardCopy, ClipboardCheck } from 'lucide-svelte';
+	import { ExternalLink, Search, Heart, Eye, EyeOff, ClipboardCopy, ClipboardCheck } from 'lucide-svelte';
 	import ActionButton from './ActionButton.svelte'; // Adjust the path as necessary
 	
 	export let onAction: (action: string) => void; // Callback for handling action clicks
@@ -49,8 +49,8 @@
 		}}
 	/>
 	<ActionButton
-		icon={Settings}
-		label="Settings"
+		icon={Search}
+		label="Search"
 		action="settings"
 		onClick={onAction}
 	/>
