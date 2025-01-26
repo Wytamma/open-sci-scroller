@@ -25,7 +25,7 @@
         <!-- Google Docs Viewer Embedded -->
         <iframe
             src={`https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`}
-            class="h-full w-full max-w-2xl relative"
+            class="h-full w-full max-w-2xl"
             frameborder="0"
             title={title}
             scrolling="no"

@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { ExternalLink, Settings, Heart, Eye, EyeOff } from 'lucide-svelte';
+	import { ExternalLink, Settings, Heart, Eye, EyeOff, ClipboardCopy, ClipboardCheck } from 'lucide-svelte';
 	import ActionButton from './ActionButton.svelte'; // Adjust the path as necessary
-
-	let overlay: boolean = true; // Overlay state
+	
 	export let onAction: (action: string) => void; // Callback for handling action clicks
 	export let isFavourite: boolean; // Favourite state
+	
+	let overlay: boolean = true; // Overlay state
+	let copied: boolean = false; // Copied state
 </script>
 
 <div
@@ -33,6 +35,18 @@
 		label="View"
 		action="view"
 		onClick={onAction}
+	/>
+	<ActionButton
+		icon={copied ? ClipboardCheck : ClipboardCopy}
+		label="Copy"
+		action="copy"
+		onClick={(action) => {
+			copied = true;
+			setTimeout(() => {
+				copied = false;
+			}, 2000);
+			onAction(action);
+		}}
 	/>
 	<ActionButton
 		icon={Settings}

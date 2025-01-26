@@ -64,7 +64,7 @@
 			loadPapers(query);
 		}
 	}
-    function handleAction(paper: Paper, action: string,) {
+    async function handleAction(paper: Paper, action: string,) {
 		if (action === 'view') {
 			// Open paper in new tab    
 			window.open(paper.pdfUrl, '_blank');
@@ -82,6 +82,11 @@
 				papers = [...papers]; // Trigger reactivity by reassigning the array
 			}
 			console.log('Overlay:', paper.overlay);
+		} else if (action === 'copy') {
+			const type = "text/plain";
+			const blob = new Blob([paper.pdfUrl], { type });
+			const data = [new ClipboardItem({ [type]: blob })];
+			await navigator.clipboard.write(data);
 		} else if (action === 'settings') {
 			const modal: ModalSettings = {
 				type: 'prompt',
@@ -103,32 +108,33 @@
 
 <swiper-container
 	direction={'vertical'}
-	slidesPerView={1}
     keyboard={true}
 	mousewheel={true}
 	on:swiperslidechange={onSlideChange}
 	class="h-full w-full"
-	spaceBetween={isMobile ? 0 : 1}
+	spaceBetween={0}
 	cssMode={true}
+	slidesPerView={"auto"}
 >
 	{#if papers.length > 0}
 		{#each papers as paper, paperIndex (paperIndex)}
-			<swiper-slide class="sm:pt-4 sm:pb-4 overflow-hidden">
-				<div class="flex justify-center h-full">
-					<PaperCard
-						title={paper.title}
-						authors={paper.authors}
-						year={paper.year}
-						tldr={paper.tldr}
-						pdfUrl={paper.pdfUrl}
-						overlay={paper.overlay}
-						renderPdf={activeIndex - 1 <= paperIndex && paperIndex <= activeIndex + 5}
-						
-					/>
-				</div>
-				<div class="flex justify-center">
-					<div class=" w-full max-w-2xl relative">
-						<Actions isFavourite={favourites.some((fav) => fav.id === paper.id)} onAction={(action) => handleAction(paper, action)} />
+			<swiper-slide class="sm:pt-4 sm:pb-2 sm:h-[95%] overflow-hidden">
+				<div class="h-full">
+					<div class="flex justify-center h-full">
+						<PaperCard
+							title={paper.title}
+							authors={paper.authors}
+							year={paper.year}
+							tldr={paper.tldr}
+							pdfUrl={paper.pdfUrl}
+							overlay={paper.overlay}
+							renderPdf={activeIndex - 1 <= paperIndex && paperIndex <= activeIndex + 5}
+						/>
+					</div>
+					<div class="flex justify-center">
+						<div class=" w-full max-w-2xl relative">
+							<Actions isFavourite={favourites.some((fav) => fav.id === paper.id)} onAction={(action) => handleAction(paper, action)} />
+					</div>
 				</div>
 			</div>
 			</swiper-slide>
