@@ -10,8 +10,8 @@
 
 	const modal: ModalSettings = {
 		type: 'prompt',
-		title: 'Open-Sci-Scroller',
-		body: 'Enter a research topic to get started',
+		title: 'SciScroller',
+		body: 'Enter a research topic to get started!',
 		value: '',
 		valueAttr: { type: 'text', minlength: 3, maxlength: 200, required: true },
 		response: (newQuery: string) => {
