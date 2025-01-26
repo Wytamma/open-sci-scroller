@@ -6,6 +6,7 @@
     import Actions from './Actions.svelte';
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { queryStore, addToFavourites, removeFromFavourites } from '$lib/stores/queryStore';
+	import { updateUrl } from '$lib/utils/updateUrl';
 
 	register();
 
@@ -32,16 +33,43 @@
 	let activeIndex = 0;
 
 	const modalStore = getModalStore();
-	
+	let modal: ModalSettings;
+	$: if (query) {
+		modal = {
+				type: 'prompt',
+				title: 'Settings',
+				body: 'Enter a new query to find related papers',
+				value: query,
+				valueAttr: { type: 'text', minlength: 3, maxlength: 200, required: true },
+				response: (newQuery: string) => {
+					if (newQuery) {
+						papers = [];
+						query = newQuery;
+						updateUrl(newQuery);
+						loadPapers(query);
+					}
+				},
+			};
+		}
+
 	// Fetch papers dynamically
 	async function loadPapers(query: string) {
 		try {
 			isLoading = true;
-			const newPapers = await fetchPapers(query, offset, limit);
+			const newPapers = await fetchPapers(query, offset, limit).catch((error) => {
+				errorMessage = error.message;
+				throw error;
+			});
+			if (newPapers.length === 0) {
+				errorMessage = 'No more papers found. Click here to update your search.';
+			}
 			papers = [...papers, ...newPapers];
+			if (papers.length === 0) {
+				errorMessage = 'No papers found. Click here to update your search.';
+			}
 		} catch (error) {
-			errorMessage = 'Failed to fetch papers. Please try again.';
 			console.error(error);
+			isLoading = false;
 		} finally {
 			isLoading = false;
 		}
@@ -88,19 +116,6 @@
 			const data = [new ClipboardItem({ [type]: blob })];
 			await navigator.clipboard.write(data);
 		} else if (action === 'settings') {
-			const modal: ModalSettings = {
-				type: 'prompt',
-				title: 'Settings',
-				body: 'Enter a new query to search for papers.',
-				value: "",
-				valueAttr: { type: 'text', minlength: 3, maxlength: 200, required: true },
-				response: (query: string) => {
-					if (query) {
-						papers = [];
-						loadPapers(query);
-					}
-				},
-			};
 			modalStore.trigger(modal);
 		}
 	}
@@ -115,10 +130,14 @@
 	spaceBetween={0}
 	cssMode={true}
 	slidesPerView={"auto"}
->
-	{#if papers.length > 0}
-		{#each papers as paper, paperIndex (paperIndex)}
-			<swiper-slide class="sm:pt-4 sm:pb-2 sm:h-[95%] overflow-hidden">
+>	
+	{#if isLoading && papers.length === 0}
+		<swiper-slide class="flex justify-center items-center text-gray-400 text-lg font-semibold">
+			Loading papers...	
+		</swiper-slide>
+	{/if}
+	{#each papers as paper, paperIndex (paperIndex)}
+			<swiper-slide class="sm:pt-4 sm:h-[96%] overflow-hidden">
 				<div class="h-full">
 					<div class="flex justify-center h-full">
 						<PaperCard
@@ -138,14 +157,12 @@
 				</div>
 			</div>
 			</swiper-slide>
-		{/each}
-	{:else if errorMessage}
-		<swiper-slide class="flex justify-center items-center text-red-500 text-lg font-semibold">
-			{errorMessage}
-		</swiper-slide>
-	{:else}
+	{/each}
+	{#if errorMessage}
 		<swiper-slide class="flex justify-center items-center text-gray-400 text-lg font-semibold">
-			Loading papers...
+			<button type="button" class="flex h-full w-full justify-center align-middle items-center text-center" on:click={() => modalStore.trigger(modal)}>
+				{errorMessage}
+			</button>
 		</swiper-slide>
 	{/if}
 </swiper-container>

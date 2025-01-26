@@ -30,6 +30,7 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
 	});
 	if (!response) return [];
 	const data = await response.json();
+	if (!data.data) return [];
 
 	return data.data.map((paper: any) => ({
 		title: paper.title,
