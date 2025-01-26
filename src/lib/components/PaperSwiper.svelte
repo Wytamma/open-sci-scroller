@@ -31,6 +31,8 @@
 	let errorMessage = '';
 	let activeIndex = 0;
 
+	const modalStore = getModalStore();
+	
 	// Fetch papers dynamically
 	async function loadPapers(query: string) {
 		try {
@@ -81,7 +83,6 @@
 			}
 			console.log('Overlay:', paper.overlay);
 		} else if (action === 'settings') {
-			const modalStore = getModalStore();
 			const modal: ModalSettings = {
 				type: 'prompt',
 				title: 'Settings',
