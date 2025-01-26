@@ -1,22 +1,38 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import PaperCard from './PaperCard.svelte';
 	import { fetchPapers } from '$lib/utils/fetchPapers';
     import { register } from 'swiper/element/bundle';
     import Actions from './Actions.svelte';
+	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { queryStore, addToFavourites, removeFromFavourites } from '$lib/stores/queryStore';
 
 	register();
 
 	export let query: string;
+	let favourites: Array<{ id: string; title: string }> = [];
 
-	let papers: Array<{ title: string; authors: string; year: string; tldr?: string, pdfUrl: string }> = [];
+	const unsubscribe = queryStore.subscribe((state) => {
+		favourites = state.favourites;
+	});
+	interface Paper {
+		title: string;
+		authors: string;
+		year: string;
+		tldr?: string;
+		pdfUrl: string;
+		overlay: boolean;
+		id: string;
+	}
+	let papers: Array<Paper> = [];
 	let offset = 0;
-	const limit = 3;
+	const limit = 10;
 	let isLoading = false;
 	let errorMessage = '';
+	let activeIndex = 0;
 
 	// Fetch papers dynamically
-	async function loadPapers() {
+	async function loadPapers(query: string) {
 		try {
 			isLoading = true;
 			const newPapers = await fetchPapers(query, offset, limit);
@@ -31,48 +47,89 @@
 
 	// Load initial papers
 	onMount(() => {
-		loadPapers();
+		loadPapers(query);
+	});
+	onDestroy(() => {
+		unsubscribe();
 	});
 
+	$: isMobile = window.matchMedia('(max-width: 768px)').matches;
+
 	function onSlideChange(event: CustomEvent) {
-		const activeIndex = event.detail[0].activeIndex;
+		activeIndex = event.detail[0].activeIndex;
 		if (activeIndex >= papers.length - 2 && !isLoading) {
 			offset += limit;
-			loadPapers();
+			loadPapers(query);
 		}
 	}
-    function handleAction(action: string) {
-		console.log(`Action performed: ${action}`);
+    function handleAction(paper: Paper, action: string,) {
+		if (action === 'view') {
+			// Open paper in new tab    
+			window.open(paper.pdfUrl, '_blank');
+		} else if (action === 'like') {
+			console.log('Liked paper:', paper.title);
+			if (favourites.some((fav) => fav.id === paper.id)) {
+				removeFromFavourites(paper.id);
+			} else {
+				addToFavourites({ title: paper.title, id: paper.id });
+			}
+		} else if (action === 'overlay') {
+			const index = papers.findIndex((p) => p.id === paper.id);
+			if (index !== -1) {
+				papers[index] = { ...papers[index], overlay: !papers[index].overlay };
+				papers = [...papers]; // Trigger reactivity by reassigning the array
+			}
+			console.log('Overlay:', paper.overlay);
+		} else if (action === 'settings') {
+			const modalStore = getModalStore();
+			const modal: ModalSettings = {
+				type: 'prompt',
+				title: 'Settings',
+				body: 'Enter a new query to search for papers.',
+				value: "",
+				valueAttr: { type: 'text', minlength: 3, maxlength: 200, required: true },
+				response: (query: string) => {
+					if (query) {
+						papers = [];
+						loadPapers(query);
+					}
+				},
+			};
+			modalStore.trigger(modal);
+		}
 	}
 </script>
 
 <swiper-container
 	direction={'vertical'}
+	slidesPerView={1}
+    keyboard={true}
 	mousewheel={true}
 	on:swiperslidechange={onSlideChange}
-	class="h-full max-w-xl mx-auto shadow-lg"
+	class="h-full w-full"
+	spaceBetween={isMobile ? 0 : 1}
+	cssMode={true}
 >
 	{#if papers.length > 0}
-		{#each papers as paper (paper.title)}
-			<swiper-slide class="rounded-lg">
-				<PaperCard
-					title={paper.title}
-					authors={paper.authors}
-					year={paper.year}
-					tldr={paper.tldr}
-                    pdfUrl={paper.pdfUrl}
-				/>
-                <Actions onAction={(action) => {
-                    if (action === 'view') {
-                        // Open paper in new tab    
-                        window.open(paper.pdfUrl, '_blank');
-                    } else if (action === 'share') {
-                        // share teh link to bsky
-                        window.open(`https://bsky.app/intent/compose?text=${encodeURIComponent(paper.pdfUrl)}`, '_blank');
-                    } else if (action === 'settings') {
-                        console.log('Opened settings for paper:', paper.title);
-                    }
-                }} />
+		{#each papers as paper, paperIndex (paperIndex)}
+			<swiper-slide class="sm:pt-4 sm:pb-4 overflow-hidden">
+				<div class="flex justify-center h-full">
+					<PaperCard
+						title={paper.title}
+						authors={paper.authors}
+						year={paper.year}
+						tldr={paper.tldr}
+						pdfUrl={paper.pdfUrl}
+						overlay={paper.overlay}
+						renderPdf={activeIndex - 1 <= paperIndex && paperIndex <= activeIndex + 3}
+						
+					/>
+				</div>
+				<div class="flex justify-center">
+					<div class=" w-full max-w-2xl relative">
+						<Actions isFavourite={favourites.some((fav) => fav.id === paper.id)} onAction={(action) => handleAction(paper, action)} />
+				</div>
+			</div>
 			</swiper-slide>
 		{/each}
 	{:else if errorMessage}

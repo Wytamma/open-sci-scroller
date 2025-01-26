@@ -1,16 +1,6 @@
-.swiper-vertical :is(.swiper-button-next, .swiper-button-prev) {
-	left: 50%;
-	transform: rotate(90deg);
-	transform-origin: left center;
-}
-.swiper-vertical .swiper-button-prev {
-	top: calc(var(--swiper-navigation-size) / 2);
-}
-.swiper-vertical .swiper-button-next {
-	top: auto;
-	bottom: calc(var(--swiper-navigation-size) / 2);
-}
-
 .swiper-slide {
-    height: 95%;
-  }
+	opacity:0;
+} 
+.swiper-slide.swiper-slide-active {
+	opacity:1;
+}

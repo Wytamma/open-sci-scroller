@@ -13,6 +13,8 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
 				year: 2023 - (index % 5),
 				tldr: `This is a mock TL;DR for paper ${index}.`,
                 pdfUrl: 'https://arxiv.org/pdf/2109.12345.pdf',
+				overlay: true,
+				id: `mock-${index}`,
 			};
 		});
 	}
@@ -22,7 +24,11 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
 		query
 	)}&openAccessPdf&offset=${offset}&limit=${limit}&fields=title,year,authors,tldr,openAccessPdf`;
 
-	const response = await fetch(url);
+	const response = await fetch(url).catch((error) => {
+		console.error('Error fetching papers:', error);
+		return null;
+	});
+	if (!response) return [];
 	const data = await response.json();
 
 	return data.data.map((paper: any) => ({
@@ -31,5 +37,7 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
 		year: paper.year || 'Unknown Year',
 		tldr: paper.tldr?.text,
         pdfUrl: paper.openAccessPdf.url,
+		overlay: true,
+		id: paper.paperId,
 	}));
 }

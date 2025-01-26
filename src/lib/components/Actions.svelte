@@ -1,39 +1,43 @@
 <script lang="ts">
-	import { Link, Share, Settings, Heart } from 'lucide-svelte'; // Example icons, replace with your preferred icons
+	import { ExternalLink, Settings, Heart, Eye, EyeOff } from 'lucide-svelte';
+	import ActionButton from './ActionButton.svelte'; // Adjust the path as necessary
 
+	let overlay: boolean = true; // Overlay state
 	export let onAction: (action: string) => void; // Callback for handling action clicks
+	export let isFavourite: boolean; // Favourite state
 </script>
 
 <div
-	class="flex-col absolute bottom-4 right-2 space-y-5 p-0 text-white"
+	class="flex flex-col absolute bottom-6 md:bottom-0 right-2 md:-right-16 space-y-7 md:space-y-5 p-0 text-white"
 	aria-label="Actions"
 >
-    <button
-        class="flex items-center justify-center p-2 bg-slate-800 bg-opacity-70 rounded-full hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        on:click={() => onAction('like')}
-        aria-label="Like"
-        >
-        <Heart class="w-5 h-5" />
-        </button>
-	<button
-		class="flex items-center justify-center p-2 bg-slate-800 bg-opacity-70 rounded-full hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
-		on:click={() => onAction('view')}
-		aria-label="View"
-	>
-		<Link class="w-5 h-5" />
-	</button>
-	<button
-		class="flex items-center justify-center p-2 bg-slate-800  bg-opacity-70 rounded-full hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
-		on:click={() => onAction('share')}
-		aria-label="Share"
-	>
-		<Share class="w-5 h-5" />
-	</button>
-	<button
-		class="flex items-center justify-center p-2 bg-slate-800 bg-opacity-70 rounded-full hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
-		on:click={() => onAction('settings')}
-		aria-label="Settings"
-	>
-		<Settings class="w-5 h-5" />
-	</button>
+	<ActionButton
+		icon={overlay ? Eye : EyeOff}
+		label="Read"
+		action="overlay"
+		onClick={(action) => {
+			onAction(action);
+			overlay = !overlay;
+		}}
+	/>
+	<div class={isFavourite ? 'text-red-500' : 'text-white}'}>
+		<ActionButton
+			icon={Heart}
+			label="Like"
+			action="like"
+			onClick={onAction}
+		/>
+	</div>
+	<ActionButton
+		icon={ExternalLink}
+		label="View"
+		action="view"
+		onClick={onAction}
+	/>
+	<ActionButton
+		icon={Settings}
+		label="Settings"
+		action="settings"
+		onClick={onAction}
+	/>
 </div>
