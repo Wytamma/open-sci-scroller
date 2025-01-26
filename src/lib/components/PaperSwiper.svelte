@@ -26,7 +26,7 @@
 	}
 	let papers: Array<Paper> = [];
 	let offset = 0;
-	const limit = 10;
+	const limit = 20;
 	let isLoading = false;
 	let errorMessage = '';
 	let activeIndex = 0;
@@ -59,7 +59,7 @@
 
 	function onSlideChange(event: CustomEvent) {
 		activeIndex = event.detail[0].activeIndex;
-		if (activeIndex >= papers.length - 2 && !isLoading) {
+		if (activeIndex >= papers.length - 6 && !isLoading) {
 			offset += limit;
 			loadPapers(query);
 		}
@@ -122,7 +122,7 @@
 						tldr={paper.tldr}
 						pdfUrl={paper.pdfUrl}
 						overlay={paper.overlay}
-						renderPdf={activeIndex - 1 <= paperIndex && paperIndex <= activeIndex + 3}
+						renderPdf={activeIndex - 1 <= paperIndex && paperIndex <= activeIndex + 5}
 						
 					/>
 				</div>
