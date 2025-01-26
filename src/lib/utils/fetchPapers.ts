@@ -33,7 +33,7 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
 
 	return data.data.map((paper: any) => ({
 		title: paper.title,
-		authors: paper.authors.map((author: any) => author.name).join(', '),
+		authors: paper.authors.length > 15 ? `${paper.authors.slice(0,15).map((author: any) => author.name).join(', ')}, ...` : paper.authors.map((author: any) => author.name).join(', '),
 		year: paper.year || 'Unknown Year',
 		tldr: paper.tldr?.text,
         pdfUrl: paper.openAccessPdf.url,
