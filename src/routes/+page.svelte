@@ -41,6 +41,6 @@
 	<PaperSwiper {query} />
 {:else}
 	<button type="button" class="flex h-full w-full justify-center align-middle items-center text-center text-gray-500" on:click={() => modalStore.trigger(modal)}>
-		Enter a query to begin.
+		Click here to enter a query.
 	</button>
 {/if}
