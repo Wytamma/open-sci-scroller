@@ -43,19 +43,23 @@
 				valueAttr: { type: 'text', minlength: 3, maxlength: 200, required: true },
 				response: (newQuery: string) => {
 					if (newQuery) {
-						papers = [];
 						query = newQuery;
-						updateUrl(newQuery);
-						loadPapers(query);
+						updateUrl(query);
+						loadPapers(query, true);
 					}
 				},
 			};
 		}
 
 	// Fetch papers dynamically
-	async function loadPapers(query: string) {
+	async function loadPapers(query: string, reset = false) {
 		try {
 			isLoading = true;
+			if (reset) {
+				offset = 0;
+				papers = [];
+				errorMessage = '';
+			}
 			const newPapers = await fetchPapers(query, offset, limit).catch((error) => {
 				errorMessage = error.message;
 				throw error;
