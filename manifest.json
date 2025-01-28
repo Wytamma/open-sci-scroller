@@ -1,7 +1,7 @@
 {
-    "name": "Open Sci Scroller",
-    "short_name": "Open Sci Scroller",
-    "description": "Explore the world of Open Science",
+    "name": "SciScroller",
+    "short_name": "SciScroller",
+    "description": "SciScroller is an intuitive app for exploring and managing scientific papers. Effortlessly search, view, and organize research in a visually engaging, swipeable format",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
