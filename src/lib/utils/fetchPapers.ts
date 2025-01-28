@@ -15,6 +15,7 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
                 pdfUrl: 'https://arxiv.org/pdf/2109.12345.pdf',
 				overlay: true,
 				id: `mock-${index}`,
+				doi: `10.1234/mock-${index}`,
 			};
 		});
 	}
@@ -22,7 +23,7 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
 	// Real API call
 	const url = `https://api.semanticscholar.org/graph/v1/paper/search?query=${encodeURIComponent(
 		query
-	)}&openAccessPdf&offset=${offset}&limit=${limit}&fields=title,year,authors,tldr,openAccessPdf`;
+	)}&openAccessPdf&offset=${offset}&limit=${limit}&fields=title,year,authors,tldr,openAccessPdf,externalIds`;
 
 	const response = await fetch(url).catch((error) => {
 		console.error('Error fetching papers:', error);
@@ -40,5 +41,6 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
         pdfUrl: paper.openAccessPdf.url,
 		overlay: true,
 		id: paper.paperId,
+		doi: paper.externalIds?.DOI,
 	}));
 }

@@ -24,6 +24,7 @@
 		pdfUrl: string;
 		overlay: boolean;
 		id: string;
+		doi: string | undefined;
 	}
 	let papers: Array<Paper> = [];
 	let offset = 0;
@@ -97,7 +98,7 @@
 		}
 	}
     async function handleAction(paper: Paper, action: string,) {
-		if (action === 'view') {
+		if (action === 'save') {
 			// Open paper in new tab    
 			window.open(paper.pdfUrl, '_blank');
 		} else if (action === 'like') {
@@ -116,7 +117,12 @@
 			console.log('Overlay:', paper.overlay);
 		} else if (action === 'copy') {
 			const type = "text/plain";
-			const blob = new Blob([paper.pdfUrl], { type });
+			let text = paper.pdfUrl;
+			if (paper.doi) {
+				text = `https://doi.org/${paper.doi}`;
+				text = text.replace(/\/$/, '');
+			}
+			const blob = new Blob([text], { type });
 			const data = [new ClipboardItem({ [type]: blob })];
 			await navigator.clipboard.write(data);
 		} else if (action === 'settings') {
