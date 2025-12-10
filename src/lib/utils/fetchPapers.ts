@@ -25,7 +25,12 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
 		query
 	)}&openAccessPdf&offset=${offset}&limit=${limit}&fields=title,year,authors,tldr,openAccessPdf,externalIds`;
 
-	const response = await fetch(url)
+	const response = await fetch(url).catch(err => {
+		// This runs only for network/CORS failures
+		console.error('Network error while fetching:', err);
+		// Convert to a regular Error so the rest of the code can treat it uniformly
+		throw new Error("Rate limit exceeded! Try again later.");
+	});
 
 	if (response.status === 429) {
 		throw new Error("Rate limit exceeded! Try again later.");
