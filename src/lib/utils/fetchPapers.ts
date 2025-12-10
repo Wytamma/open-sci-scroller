@@ -25,15 +25,16 @@ export async function fetchPapers(query: string, offset: number, limit: number) 
 		query
 	)}&openAccessPdf&offset=${offset}&limit=${limit}&fields=title,year,authors,tldr,openAccessPdf,externalIds`;
 
-	const response = await fetch(url).catch((error) => {
-		throw new Error("Error fetching papers!");
-	});
+	const response = await fetch(url)
 
 	if (response.status === 429) {
-		throw new Error("Rate limit exceeded!");
+		throw new Error("Rate limit exceeded! Try again later.");
 	}
 
-	if (!response) return [];
+	if (!response.ok) {
+		throw new Error("Error fetching papers!");
+	}
+
 	const data = await response.json();
 	if (!data.data) return [];
 
